@@ -11,7 +11,6 @@ HttpClient::HttpResponse HttpClient::get(const std::string& path,
     cli.set_read_timeout(5, 0);
 
     httplib::Headers headers;
-    // BUG: Uses Basic instead of Bearer auth
     headers.emplace("Authorization", "Basic " + api_key_);
     headers.emplace("User-Agent", "Stripe-Integration/1.0");
 
@@ -42,8 +41,6 @@ HttpClient::HttpResponse HttpClient::post(const std::string& path,
         headers.emplace(k, v);
     }
 
-    // BUG: Hardcodes application/json instead of using the provided content_type
-    // causing endpoints expecting application/x-www-form-urlencoded to reject the request
     auto res = cli.Post(path, headers, body, "application/json");
     if (!res) {
         return {500, "Connection error"};

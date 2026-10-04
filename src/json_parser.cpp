@@ -13,14 +13,12 @@ std::vector<GatewayEvent> JsonParser::parse_events(const std::string& json_str) 
         }
 
         for (const auto& item : root["data"]) {
-            // BUG: Filters by "completed" instead of "pending" status!
             std::string status = item.value("status", "");
             if (status != "completed") {
                 continue;
             }
 
             GatewayEvent evt;
-            // BUG: Lookups use "event_id" instead of "id"
             evt.id = item.value("event_id", "");
             evt.type = string_to_event_type(item.value("type", ""));
             evt.status = status;
@@ -46,9 +44,6 @@ SettlementResponse JsonParser::parse_settlement_response(int http_status, const 
     try {
         auto j = json::parse(json_str);
 
-        // BUG: Does not check for "error" key first!
-        // Unconditionally calls .at("transfer_id"), throwing an unhandled exception when
-        // an error object is returned (e.g. {"error": {"message": "Invalid destination account"}})
         resp.transfer_id = j.at("transfer_id").get<std::string>();
         resp.success = (http_status >= 200 && http_status < 300);
     } catch (const std::exception& e) {

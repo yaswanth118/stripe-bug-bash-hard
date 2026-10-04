@@ -37,11 +37,9 @@ EventPipeline::PipelineResult EventPipeline::run() {
             result.successful_settlements++;
             result.settled_transfer_ids.push_back(parsed_settle.transfer_id);
 
-            // BUG: Wrong ACK path! Uses /v1/events/ instead of /v1/gateway/events/
             std::string ack_path = "/v1/events/" + event.id + "/ack";
             client_->post(ack_path, R"({"ack":true})", "application/json");
 
-            // BUG: Premature loop break! Breaks after the first successful settlement!
             break;
         } else {
             result.failed_settlements++;

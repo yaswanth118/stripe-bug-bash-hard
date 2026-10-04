@@ -34,8 +34,6 @@ static std::string hmac_sha256(const std::string& key, const std::string& data) 
 #endif
 
 std::string WebhookSigner::compute_signature(const std::string& secret, int64_t timestamp, const std::string& payload) {
-    // BUG: Signs payload only, omitting the timestamp prefix!
-    // Stripe requires HMAC(secret, timestamp + "." + payload)
     std::string signature = hmac_sha256(secret, payload);
     return "t=" + std::to_string(timestamp) + ",v1=" + signature;
 }
